@@ -13,5 +13,5 @@ First the config.py file needs to be added, based on the config - TEMPLATE.py fi
 Change the URLs in the main.py file with your own and run the main.py file.
 
 ### Comments 
-- When the app is deployed from Heroku, you get a reCAPTCHA from zimmo.be when requesting the page source a second time. This is probably because you are accessing the webpage   from outside Belgium.
+- When the app is deployed from Heroku, you get a reCAPTCHA from zimmo.be when requesting the page source a second time. This is probably because you are accessing the webpage   from outside Belgium when running from Heroku.
 - We use the requests python module to get the page source of the zimmo webpage and the selenium module for the other webpages because zimmo.be requests captcha with selenium
