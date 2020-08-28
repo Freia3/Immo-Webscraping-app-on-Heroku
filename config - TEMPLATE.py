@@ -10,3 +10,5 @@ TO_EMAIL="" # add email address
 
 # look at "max_count" last articles
 max_count=5
+
+MYNAME="Freia"  # put your name here, e-mail will be sent from this name
