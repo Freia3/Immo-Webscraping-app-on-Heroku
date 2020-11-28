@@ -66,7 +66,7 @@ def fetch_records_psql(database_url):
 
 def insert_into_psql(df_articles,database_url):
     engine = create_engine(database_url)
-    df_articles.to_sql('db_table2', engine, if_exists='append')
+    df_articles.to_sql('Articles', engine, if_exists='append')
 
 def get_chromedriver():
     if str(os.getcwd()) != "/app": #code executed on my local machine (windows)

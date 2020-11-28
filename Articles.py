@@ -127,11 +127,12 @@ class ListNewArticles:
                                    f"height=\"200\" width=\"450\" /> " + "</a></p>"
                     # define files_images, this will make sure screenshot is attached to e-mail
                     if str(os.getcwd()) != "/app":  # code is run on my local machine (windows)
-                        files_images = ("inline", open(str(os.getcwd()) + f"\\screenshot_immoscoop_{article_type}{count}.png", "rb"))
+                        files_images = [("inline", open(str(os.getcwd()) + f"\\screenshot_immoscoop_{article_type}{count}.png", "rb"))]
                     else:  # code is run on heroku
-                        files_images = ("inline", open(str(os.getcwd()) + f"/screenshot_immoscoop_{article_type}{count}.png", "rb"))
+                        files_images = [("inline", open(str(os.getcwd()) + f"/screenshot_immoscoop_{article_type}{count}.png", "rb"))]
 
                     # add new articles
+                    print(type(files_images))
                     df = pd.DataFrame({"article_id": article_id, "html_message": html_message, "files_images": files_images, "article_type": article_type, "webpage": webpage}, index=[1])
                     self.df_articles=self.df_articles.append(df,ignore_index = True)
 
