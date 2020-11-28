@@ -3,7 +3,7 @@ from config import max_count
 from bs4 import BeautifulSoup
 import os
 
-
+#bla
 class SingleArticle:
     def __init__(self, article_id, html_message, files_images, article_type, webpage):
         self.article_id = article_id
