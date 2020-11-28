@@ -19,22 +19,22 @@ type2="bouwgrond"
 url="https://www.immoscoop.be/immo.php?search_field=&main_city%5B%5D=2623&s_postcode%5B%5D=897&s_postcode%5B%5D=700&s_postcode%5B%5D=803&s_postcode%5B%5D=1522&s_postcode%5B%5D=1514&category=&min_price=0&max_price=&bedroom=&baths=&order=date&proptype=Sale"
 list_new_articles.find_and_add_new_articles(url, "immoscoop", type1)
 #
-# url="https://www.immoscoop.be/immo.php?min_price=0&max_price=&proptype=Sale&radio-1=on&ajax=&distance=&country=&streetname=&livingareacondition=&livingarea=&plotareacondition=&plotarea=&yearcondition=&year=&province=&country=&bedroom=&feature=&searchcity=&region=&category=Grond&order=date&get_newproject=&s_postcode%5B%5D=897&s_postcode%5B%5D=700&s_postcode%5B%5D=803&s_postcode%5B%5D=1522&s_postcode%5B%5D=1514&main_city%5B%5D=2623"
-# list_new_articles.find_and_add_new_articles(url, "immoscoop", type2)
-#
-# # #   ZIMMO #
-# url="https://www.zimmo.be/nl/panden/?status=1&type%5B0%5D=5&hash=d29e8ddd1fa4ad3f7fc14bb8a1cfb91d&priceIncludeUnknown=1&priceChangedOnly=0&bedroomsIncludeUnknown=1&bathroomsIncludeUnknown=1&constructionIncludeUnknown=1&livingAreaIncludeUnknown=1&landAreaIncludeUnknown=1&commercialAreaIncludeUnknown=1&yearOfConstructionIncludeUnknown=1&epcIncludeUnknown=1&queryCondition=and&includeNoPhotos=1&includeNoAddress=1&onlyRecent=0&onlyRecentlyUpdated=0&isPlus=0&region=list&district=MzCgLjAEAA%253D%253D&sort=recent&sort_order=desc#gallery"
-# list_new_articles.find_and_add_new_articles(url, "zimmo", type1)
-#
-# url="https://www.zimmo.be/nl/panden/?status=1&type%5B0%5D=3&hash=3f761ce658b9c44b4f4d6df656e425bd&priceIncludeUnknown=1&priceChangedOnly=0&bedroomsIncludeUnknown=1&bathroomsIncludeUnknown=1&constructionIncludeUnknown=1&livingAreaIncludeUnknown=1&landAreaIncludeUnknown=1&commercialAreaIncludeUnknown=1&yearOfConstructionIncludeUnknown=1&epcIncludeUnknown=1&queryCondition=and&includeNoPhotos=1&includeNoAddress=1&onlyRecent=0&onlyRecentlyUpdated=0&isPlus=0&region=list&district=MzCgLjAEAA%253D%253D#gallery"
-# list_new_articles.find_and_add_new_articles(url, "immoscoop", type2)
-#
-# #   IMMOWEB #
-# url="https://www.immoweb.be/nl/zoeken/huis/te-koop/leuven/3000?countries=BE&orderBy=newest"  # -->orderBy=newest --> chronologically ordered items
-# list_new_articles.find_and_add_new_articles(url, "immoweb", type1)
-#
-# url="https://www.immoweb.be/nl/zoeken/grond/te-koop/leuven/arrondissement?countries=BE&orderBy=newest"
-# list_new_articles.find_and_add_new_articles(url, "immoweb", type2)
+url="https://www.immoscoop.be/immo.php?min_price=0&max_price=&proptype=Sale&radio-1=on&ajax=&distance=&country=&streetname=&livingareacondition=&livingarea=&plotareacondition=&plotarea=&yearcondition=&year=&province=&country=&bedroom=&feature=&searchcity=&region=&category=Grond&order=date&get_newproject=&s_postcode%5B%5D=897&s_postcode%5B%5D=700&s_postcode%5B%5D=803&s_postcode%5B%5D=1522&s_postcode%5B%5D=1514&main_city%5B%5D=2623"
+list_new_articles.find_and_add_new_articles(url, "immoscoop", type2)
+
+# #   ZIMMO #
+url="https://www.zimmo.be/nl/panden/?status=1&type%5B0%5D=5&hash=d29e8ddd1fa4ad3f7fc14bb8a1cfb91d&priceIncludeUnknown=1&priceChangedOnly=0&bedroomsIncludeUnknown=1&bathroomsIncludeUnknown=1&constructionIncludeUnknown=1&livingAreaIncludeUnknown=1&landAreaIncludeUnknown=1&commercialAreaIncludeUnknown=1&yearOfConstructionIncludeUnknown=1&epcIncludeUnknown=1&queryCondition=and&includeNoPhotos=1&includeNoAddress=1&onlyRecent=0&onlyRecentlyUpdated=0&isPlus=0&region=list&district=MzCgLjAEAA%253D%253D&sort=recent&sort_order=desc#gallery"
+list_new_articles.find_and_add_new_articles(url, "zimmo", type1)
+
+url="https://www.zimmo.be/nl/panden/?status=1&type%5B0%5D=3&hash=3f761ce658b9c44b4f4d6df656e425bd&priceIncludeUnknown=1&priceChangedOnly=0&bedroomsIncludeUnknown=1&bathroomsIncludeUnknown=1&constructionIncludeUnknown=1&livingAreaIncludeUnknown=1&landAreaIncludeUnknown=1&commercialAreaIncludeUnknown=1&yearOfConstructionIncludeUnknown=1&epcIncludeUnknown=1&queryCondition=and&includeNoPhotos=1&includeNoAddress=1&onlyRecent=0&onlyRecentlyUpdated=0&isPlus=0&region=list&district=MzCgLjAEAA%253D%253D#gallery"
+list_new_articles.find_and_add_new_articles(url, "immoscoop", type2)
+
+#   IMMOWEB #
+url="https://www.immoweb.be/nl/zoeken/huis/te-koop/leuven/3000?countries=BE&orderBy=newest"  # -->orderBy=newest --> chronologically ordered items
+list_new_articles.find_and_add_new_articles(url, "immoweb", type1)
+
+url="https://www.immoweb.be/nl/zoeken/grond/te-koop/leuven/arrondissement?countries=BE&orderBy=newest"
+list_new_articles.find_and_add_new_articles(url, "immoweb", type2)
 
 driver.close()  # close chromedriver
 #

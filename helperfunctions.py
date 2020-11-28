@@ -93,7 +93,7 @@ def get_parsed_page_content(url):
         'referer': 'https://www.google.com/'} # referer added to avoid captcha on zimmo webpage
 
     r = requests.get(url, headers=headers)
-    time.sleep(1)   # don't get blocked by requesting websource too fast after each other
+    time.sleep(1)   # don't get blocked by requesting websource too quickly one after another
     webpage = r.content.decode('utf8')
     soup = BeautifulSoup(webpage, 'html.parser')
     return soup
