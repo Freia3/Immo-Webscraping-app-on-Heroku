@@ -132,7 +132,7 @@ class ListNewArticles:
                         files_images = ("inline", open(str(os.getcwd()) + f"/screenshot_immoscoop_{article_type}{count}.png", "rb"))
 
                     # add new articles
-                    df = pd.DataFrame({"article_id": article_id, "html_message": html_message, "files_images": None, "article_type": article_type, "webpage": webpage}, index=[1])
+                    df = pd.DataFrame({"article_id": article_id, "html_message": html_message, "files_images": files_images, "article_type": article_type, "webpage": webpage}, index=[1])
                     self.df_articles=self.df_articles.append(df,ignore_index = True)
 
                 else:
@@ -143,8 +143,10 @@ class ListNewArticles:
 
 
     def get_list_html_message(self,article_type):
-        return self.df_articles[self.df_articles["article_type"]==article_type]["html_message"].values
+        list=self.df_articles[self.df_articles["article_type"]==article_type]["html_message"].values.tolist()
+        return list
 
     def get_list_files_images(self,article_type):
-        return self.df_articles[self.df_articles["article_type"]==article_type]["html_message"].values
+        list=self.df_articles[(self.df_articles["article_type"]==article_type) & (self.df_articles["files_images"].notnull())]["files_images"].values.tolist()
+        return list
 

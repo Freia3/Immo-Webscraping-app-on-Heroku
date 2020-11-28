@@ -104,7 +104,9 @@ def get_parsed_page_content(url):
 def send_simple_message(list_articles, article_type, TO_EMAIL, MAILGUN_API_KEY,MAILGUN_DOMAIN, MYNAME):
     files_images = list_articles.get_list_files_images(article_type)
     html_message = list_articles.get_list_html_message(article_type)
-    if html_message.all():  # if not empty
+    print(html_message)
+    print(files_images)
+    if html_message:  # if not empty
         return requests.post(
             "https://api.mailgun.net/v3/"+MAILGUN_DOMAIN+"/messages",
             auth=("api", MAILGUN_API_KEY),
