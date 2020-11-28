@@ -7,6 +7,8 @@ import os
 from bs4 import BeautifulSoup
 import requests
 import time
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def connect_to_postgresdb(database_url):
@@ -65,8 +67,7 @@ def get_chromedriver():
         chrome_options = Options()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("no-sandbox")
-        driver = webdriver.Chrome(
-            executable_path=str(os.getcwd())+"\chromedriver.exe", options=chrome_options)
+        driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
         return driver
     else: #code executed on heroku container (unix)
         chrome_options = Options()
