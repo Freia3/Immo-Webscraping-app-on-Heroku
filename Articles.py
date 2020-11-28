@@ -2,27 +2,21 @@ from helperfunctions import get_parsed_page_content
 from config import max_count
 from bs4 import BeautifulSoup
 import os
-
-
-class SingleArticle:
-    def __init__(self, article_id, html_message, files_images, article_type, webpage):
-        self.article_id = article_id
-        self.html_message = html_message
-        self.files_images=files_images
-        self.article_type=article_type
-        self.webpage=webpage
-
+import pandas as pd
 
 class ListNewArticles:
-    # ListNewArticles object will hold a list of SingleArticle objects which are new
+    # ListNewArticles object will hold a dataframe with new articles, dataframe with existing articles, and instance of chromedriver
 
-    def __init__(self, driver, list_existing_article_ids):
-        self.article_list=[]
+    def __init__(self, driver, df_existing_article_ids):
+        self.df_articles = pd.DataFrame(columns=["article_id", "html_message", "files_images","article_type","webpage"])
         self.driver=driver  # chromedriver will be used to get source page
-        self.list_existing_article_ids=list_existing_article_ids
+        self.df_existing_article_ids=df_existing_article_ids
+
+    def get_df_articles(self):
+        return self.df_articles
 
     def add_article(self, article):
-        self.article_list.append(article)
+        self.article_list.append(article,ignore_index = True)
 
     def find_and_add_new_articles(self,url, webpage, article_type):  # find and articles that are not yet existing in database
         if webpage == "zimmo":
@@ -38,7 +32,7 @@ class ListNewArticles:
         parsed_page_source = get_parsed_page_content(url)
         count = -1
 
-        # Check if you get captcha error
+        # Check if you get ReCaptcha error
         if parsed_page_source.get_text().find("Om zeker te zijn dat u geen robot bent") == -1:
 
             # loop over articles (should be ordered chronologically), until "max_count" numbered article
@@ -47,7 +41,7 @@ class ListNewArticles:
                     count += 1
                     article_id = item.get('id')  # unique identifier for article, this will be saved in database
 
-                    if not (article_id in self.list_existing_article_ids):  # article is not yet in database
+                    if not (article_id in self.df_existing_article_ids.values):  # article is not yet in database
 
                         # html message that will be included in e-mail
                         src_image = item.find("img", class_="property-thumb").get("src")   # find source url image
@@ -57,7 +51,8 @@ class ListNewArticles:
                                        + f" <a href=\"{url}\"> <img src={src_image} height=\"200\" width=\"450\" />" "</a></p>"
 
                         # add new articles
-                        self.add_article(SingleArticle(article_id, html_message, (), article_type,webpage))
+                        df = pd.DataFrame({"article_id":article_id,"html_message":html_message,"files_images":None,"article_type":article_type,"webpage":webpage}, index=[1])
+                        self.df_articles=self.df_articles.append(df,ignore_index = True)
                     else:
                         # article is already in database, so we stop here. As articles are ordered chronologically, we won't find new articles after this one
                         break
@@ -82,7 +77,7 @@ class ListNewArticles:
                 if item_parsed_paged_source.find('article', class_="card") is not None:
                     article_id = item_parsed_paged_source.find('article', class_="card").get('id')
 
-                    if not (article_id in self.list_existing_article_ids):  # article is not yet in database
+                    if not (article_id in self.df_existing_article_ids.values):  # article is not yet in database
 
                         try:
                             self.driver.find_element_by_id("uc-btn-accept-banner").click()  # click on accept cookies
@@ -101,8 +96,8 @@ class ListNewArticles:
                             files_images = ("inline", open(str(os.getcwd()) + f"/screenshot_immoweb_{article_type}{count}.png", "rb"))
 
                         # add new articles
-                        self.add_article(SingleArticle(article_id, html_message, files_images, article_type,webpage))
-
+                        df = pd.DataFrame({"article_id":article_id,"html_message":html_message,"files_images":files_images,"article_type":article_type,"webpage":webpage}, index=[1])
+                        self.df_articles=self.df_articles.append(df,ignore_index = True)
                     else:
                         # article is already in database, so we stop here. As articles are ordered chronologically, we won't find new articles after this one
                         break
@@ -111,7 +106,6 @@ class ListNewArticles:
 
     def find_and_add_add_immoscoop_articles(self, url, article_type, webpage):
         self.driver.get(url)
-
         count = -1
 
         # Loop over articles (should be ordered chronologically), until "max_count" numbered article
@@ -122,9 +116,8 @@ class ListNewArticles:
             if count < max_count:
                 count += 1
                 article_id = item_parsed_paged_source.find('a').get('href')  # unique identifier for article, this will be saved in database
-
                 # does article already exist in database?
-                if not (article_id in self.list_existing_article_ids):
+                if not (article_id in self.df_existing_article_ids.values):
                     item.screenshot(
                         f"screenshot_immoscoop_{article_type}{count}.png")
 
@@ -132,7 +125,6 @@ class ListNewArticles:
                     html_message = f" <p> <b> nieuwe {article_type} immoscoop <br> " \
                                    f"</b> <a href=\"{url}\"> <img src=\"cid:screenshot_immoscoop_{article_type}{count}.png\" " \
                                    f"height=\"200\" width=\"450\" /> " + "</a></p>"
-
                     # define files_images, this will make sure screenshot is attached to e-mail
                     if str(os.getcwd()) != "/app":  # code is run on my local machine (windows)
                         files_images = ("inline", open(str(os.getcwd()) + f"\\screenshot_immoscoop_{article_type}{count}.png", "rb"))
@@ -140,46 +132,19 @@ class ListNewArticles:
                         files_images = ("inline", open(str(os.getcwd()) + f"/screenshot_immoscoop_{article_type}{count}.png", "rb"))
 
                     # add new articles
-                    self.add_article(SingleArticle(article_id, html_message, files_images, article_type,webpage))
+                    df = pd.DataFrame({"article_id": article_id, "html_message": html_message, "files_images": None, "article_type": article_type, "webpage": webpage}, index=[1])
+                    self.df_articles=self.df_articles.append(df,ignore_index = True)
+
                 else:
                     # article is already in database, so we stop here. As articles are ordered chronologically, we won't find new articles after this one
                     break
             else:
                 break
 
-    def get_list_article_id(self):
-        list_article_id=[]
-        for item in self.article_list:
-            list_article_id.append(item.article_id)
-        return list_article_id
 
     def get_list_html_message(self,article_type):
-        list_html_message=[]
-        for item in self.article_list:
-            if item.article_type == article_type:
-                list_html_message.append(item.html_message)
-        return list_html_message
+        return self.df_articles[self.df_articles["article_type"]==article_type]["html_message"].values
 
     def get_list_files_images(self,article_type):
-        list_files_images=[]
-        for item in self.article_list:
-            if item.article_type == article_type:
-                if item.files_images != ():
-                    list_files_images.append(item.files_images)
-        return list_files_images
+        return self.df_articles[self.df_articles["article_type"]==article_type]["html_message"].values
 
-    def __str__(self):
-
-        # Count number of new articles per webpage and article_type
-        count = {}
-        for item in list(self.article_list):
-            count[item.webpage + " " + item.article_type] = count.get(item.webpage + " " + item.article_type, 0) + 1
-
-        # Create string to print out number of new articles
-        print_string=""
-        for k, v in count.items():
-            if v == 1:
-                print_string += (k+": "+str(v)+" new article \n")
-            else:
-                print_string += (k + ": " + str(v) + " new articles \n")
-        return print_string

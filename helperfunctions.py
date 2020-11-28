@@ -7,11 +7,15 @@ import os
 from bs4 import BeautifulSoup
 import requests
 import time
+import sys
+import pandas as pd
+from sqlalchemy import create_engine
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 
 
 def connect_to_postgresdb(database_url):
+    con = None
     if str(os.getcwd()) != "/app":  # code executed on my local machine (windows)
         url = urlparse.urlparse(database_url)
         dbname = url.path[1:]
@@ -26,48 +30,52 @@ def connect_to_postgresdb(database_url):
         password = url.password
         host = url.hostname
         port = url.port
-    con = psycopg2.connect(
+    try:
+        # connect to PostgreSQl database server
+        con = psycopg2.connect(
         dbname=dbname,
         user=user,
         password=password,
         host=host,
         port=port
-    )
+        )
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        sys.exit(1)
     return con
 
 
 def fetch_records_psql(database_url):
-    con=connect_to_postgresdb(database_url) #connect to PostGres DB
+    con=connect_to_postgresdb(database_url) #connect to PostGreSQL DB
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = con.cursor()
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS public."Articles"(user_id serial PRIMARY KEY, article_id VARCHAR (150) NOT NULL);
-    select article_id from public."Articles";""")
+    try:
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS public."Articles"(user_id serial PRIMARY KEY, article_id VARCHAR (150) NOT NULL);
+        select article_id from public."Articles";""")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error: %s" % error)
+        cur.close()
+        return 1
+
     records = cur.fetchall()
-    out = [item for t in records for item in t]
+    df=pd.DataFrame(records,columns=["article_id"])
     cur.close()
-    con.close()
-    return out
+    con.close() #close connection to DB
+    return df
 
-
-def insert_into_psql(list_article_ids,database_url):
-    con = connect_to_postgresdb(database_url)  # connect to PostGres DB and return connector
-    con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    cur = con.cursor()
-    for item in list_article_ids:
-
-        cur.execute(f"""
-            INSERT INTO public."Articles"(article_id) VALUES ('{item}'); """)
-    cur.close()
-    con.close()
-
+def insert_into_psql(df_articles,database_url):
+    engine = create_engine(database_url)
+    df_articles.to_sql('db_table2', engine, if_exists='append')
 
 def get_chromedriver():
     if str(os.getcwd()) != "/app": #code executed on my local machine (windows)
         chrome_options = Options()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("no-sandbox")
-        driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
+        # driver = webdriver.Chrome(
+        #     executable_path=str(os.getcwd())+"\chromedriver.exe", options=chrome_options)
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
         return driver
     else: #code executed on heroku container (unix)
         chrome_options = Options()
@@ -96,7 +104,7 @@ def get_parsed_page_content(url):
 def send_simple_message(list_articles, article_type, TO_EMAIL, MAILGUN_API_KEY,MAILGUN_DOMAIN, MYNAME):
     files_images = list_articles.get_list_files_images(article_type)
     html_message = list_articles.get_list_html_message(article_type)
-    if html_message:  # if not empty
+    if html_message.all():  # if not empty
         return requests.post(
             "https://api.mailgun.net/v3/"+MAILGUN_DOMAIN+"/messages",
             auth=("api", MAILGUN_API_KEY),
