@@ -64,17 +64,15 @@ def fetch_records_psql(database_url):
     con.close() #close connection to DB
     return df
 
-def insert_into_psql(df_articles,database_url):
+def insert_into_psql(df_articles,database_url): # insert dataframe into DB
     engine = create_engine(database_url)
-    df_articles.to_sql('Articles', engine, if_exists='append')
+    df_articles["article_id"].to_sql('Articles', con=engine,schema="public", if_exists='append',index=False)
 
 def get_chromedriver():
     if str(os.getcwd()) != "/app": #code executed on my local machine (windows)
         chrome_options = Options()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("no-sandbox")
-        # driver = webdriver.Chrome(
-        #     executable_path=str(os.getcwd())+"\chromedriver.exe", options=chrome_options)
         driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
         return driver
     else: #code executed on heroku container (unix)
@@ -104,8 +102,6 @@ def get_parsed_page_content(url):
 def send_simple_message(list_articles, article_type, TO_EMAIL, MAILGUN_API_KEY,MAILGUN_DOMAIN, MYNAME):
     files_images = list_articles.get_list_files_images(article_type)
     html_message = list_articles.get_list_html_message(article_type)
-    print(html_message)
-    print(files_images)
     if html_message:  # if not empty
         return requests.post(
             "https://api.mailgun.net/v3/"+MAILGUN_DOMAIN+"/messages",
