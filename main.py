@@ -40,7 +40,7 @@ driver.close()  # close chromedriver
 #
 # Print all the new found articles
 with pd.option_context('display.max_rows', 1000, 'display.max_columns', 100):
-    print(list_new_articles.df_articles)
+    print(list_new_articles)
 
 # Insert newly found articles into database
 insert_into_psql(list_new_articles.get_df_articles(), database_url)

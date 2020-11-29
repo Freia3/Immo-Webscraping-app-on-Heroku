@@ -61,19 +61,15 @@ class ListNewArticles:
     def find_and_add_immoweb_articles(self, url, article_type, webpage):
         self.driver.get(url)
         self.driver.set_window_size(1500, 2000)  # load images of this window size (otherwise unloaded images on screenshot)
-
         count = -1
-
         # Loop over articles
         for item in self.driver.find_elements_by_class_name('search-results__item'):
             item_page_source=item.get_attribute('innerHTML')
             item_parsed_paged_source = BeautifulSoup(item_page_source, 'html.parser')
-
             if count < max_count:
                 count += 1
                 if item_parsed_paged_source.find('article', class_="card") is not None:
                     article_id = item_parsed_paged_source.find('article', class_="card").get('id')
-
                     if not (article_id in self.df_existing_article_ids.values):  # article is not yet in database
 
                         try:
@@ -88,9 +84,9 @@ class ListNewArticles:
 
                         # files_images makes sure screenshot is attached to email
                         if str(os.getcwd()) != "/app":  # is code run on my local machine or on heroku?
-                            files_images = ("inline", open(str(os.getcwd()) + f"\\screenshot_immoweb_{article_type}{count}.png", "rb"))
+                            files_images = [("inline", open(str(os.getcwd()) + f"\\screenshot_immoweb_{article_type}{count}.png", "rb"))]
                         else:
-                            files_images = ("inline", open(str(os.getcwd()) + f"/screenshot_immoweb_{article_type}{count}.png", "rb"))
+                            files_images = [("inline", open(str(os.getcwd()) + f"/screenshot_immoweb_{article_type}{count}.png", "rb"))]
 
                         # add new articles
                         df = pd.DataFrame({"article_id":article_id,"html_message":html_message,"files_images":files_images,"article_type":article_type,"webpage":webpage}, index=[1])
@@ -104,12 +100,10 @@ class ListNewArticles:
     def find_and_add_add_immoscoop_articles(self, url, article_type, webpage):
         self.driver.get(url)
         count = -1
-
         # Loop over articles (should be ordered chronologically), until "max_count" numbered article
         for item in self.driver.find_elements_by_class_name('search-result-position'):
             item_page_source=item.get_attribute('innerHTML')
             item_parsed_paged_source = BeautifulSoup(item_page_source, 'html.parser')
-
             if count < max_count:
                 count += 1
                 article_id = item_parsed_paged_source.find('a').get('href')  # unique identifier for article, this will be saved in database
@@ -146,4 +140,14 @@ class ListNewArticles:
     def get_list_files_images(self,article_type):
         list=self.df_articles[(self.df_articles["article_type"]==article_type) & (self.df_articles["files_images"].notnull())]["files_images"].values.tolist()
         return list
+
+    def __str__(self):
+        print_str="number of articles zimmo "+str(len(self.df_articles[self.df_articles["webpage"]=="zimmo"].index)) \
+         +"\n" \
+         + "number of articles immoweb " \
+         +str(len(self.df_articles[self.df_articles["webpage"]=="immoweb"].index)) +"\n" \
+         +"number of articles immoscoop "+str(len(self.df_articles[self.df_articles["webpage"]=="immoscoop"].index))
+
+        return print_str
+
 
